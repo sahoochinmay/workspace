@@ -1,82 +1,107 @@
 import React, { useState } from "react";
 import "./workflow.css";
 import { ArcherContainer, ArcherElement } from "react-archer";
+import { v4 as uuidv4 } from "uuid";
 
 const WorkFlow = () => {
-  const col1 = [
+  const [dept, setDept] = useState([
     {
       id: "dep1",
       name: "dep1",
-      sub: ["fun1", "fun2"],
+      flow: [
+        {
+          func: "fun1",
+          subFunc: ["sub1"],
+        },
+        {
+          func: "fun2",
+          subFunc: ["sub3", "sub4"],
+        },
+      ],
     },
     {
       id: "dep2",
       name: "dep2",
-      sub: ["fun2"],
+      flow: [
+        {
+          func: "fun1",
+          subFunc: ["sub4"],
+        },
+        {
+          func: "fun2",
+          subFunc: ["sub2"],
+        },
+      ],
     },
-  ];
-  const col2 = [
+    {
+      id: "dep3",
+      name: "dep3",
+    },
+    {
+      id: "dep4",
+      name: "dep4",
+    },
+  ]);
+  const [func, setFunc] = useState([
     {
       id: "fun1",
       name: "fun1",
-      sub: ["sub1", "sub2", "sub3"],
-      main: ["dep1"],
     },
     {
       id: "fun2",
       name: "fun2",
-      sub: ["sub1", "sub4", "sub3"],
-      main: ["dep1", "dep2"],
     },
-  ];
-  const col3 = [
+    {
+      id: "fun3",
+      name: "fun3",
+    },
+    {
+      id: "fun4",
+      name: "fun4",
+    },
+  ]);
+  const [subFunc, setSubFunc] = useState([
     {
       id: "sub1",
       name: "sub1",
-      main: ["dep1", "dep2"],
     },
     {
       id: "sub2",
       name: "sub2",
-      main: ["dep1"],
     },
     {
       id: "sub3",
       name: "sub3",
-      main: ["dep1", "dep2"],
     },
     {
       id: "sub4",
       name: "sub4",
-      main: ["dep1", "dep2"],
     },
-    {
-      id: "sub5",
-      name: "sub5",
-    },
-  ];
-  const [activeBox, setActiveBox] = useState(col1[0]?.id);
+  ]);
+  const [activeBox, setActiveBox] = useState(dept[0]);
   return (
     <div>
       <h2>Workflow</h2>
       <ArcherContainer lineStyle="curve" strokeColor="black">
-        <div className="main_container">
-          <div className="col1">
-            {col1?.map((val) => {
+        <div className="workflow_container">
+          <div className="department">
+            {dept?.map((val) => {
               let relation = [];
-              val?.sub?.every((i) =>
+              val?.flow?.map((i) =>
                 relation.push({
-                  targetId: i,
+                  targetId: i?.func,
                   targetAnchor: "left",
                   sourceAnchor: "right",
-                  style: { strokeDasharray: "3,3" },
+                  style: {
+                    strokeDasharray: "3,3",
+                  },
                 })
               );
-              if (activeBox === val.id) {
+              if (activeBox === val) {
                 return (
                   <ArcherElement id={val.id} relations={relation}>
-                    <div id={val.id} className="activeBox box">
-                      {val?.name}
+                    <div id={val.id} className="activeBox department_card box">
+                      <span className="label">Department</span>
                     </div>
                   </ArcherElement>
                 );
@@ -85,55 +110,49 @@ const WorkFlow = () => {
                 <div
                   id={val.id}
                   className="box"
-                  onClick={() => setActiveBox(val.id)}
+                  onClick={() => setActiveBox(val)}
                 >
                   {val?.name}
                 </div>
               );
             })}
           </div>
-          <div className="col2">
-            {col2?.map((val) => {
+          <div className="func">
+            {func?.map((val) => {
+              let result = [];
+              activeBox?.flow?.map((d) => {
+                if (d?.func === val?.id) {
+                  d?.subFunc?.map((i) => result?.push(i));
+                }
+              });
               let relation = [];
-              val?.sub?.every((i) =>
+              result?.map((i) =>
                 relation.push({
                   targetId: i,
                   targetAnchor: "left",
                   sourceAnchor: "right",
-                  style: { strokeDasharray: "3,3" },
+                  style: {
+                    strokeDasharray: "3,3",
+                  },
                 })
               );
-              if (val?.main.includes(activeBox)) {
-                return (
-                  <ArcherElement id={val.id} relations={relation}>
-                    <div id={val.id} className="box activeBox">
-                      {val?.name}
-                    </div>
-                  </ArcherElement>
-                );
-              }
               return (
-                <div id={val.id} className="box">
-                  {val?.name}
-                </div>
+                <ArcherElement id={val.id} relations={relation}>
+                  <div id={val.id} className="box activeBox">
+                    {val?.name}
+                  </div>
+                </ArcherElement>
               );
             })}
           </div>
-          <div className="col3">
-            {col3?.map((val) => {
-              if (val?.main?.includes(activeBox)) { 
-                return (
-                  <ArcherElement id={val.id}>
-                    <div id={val.id} className="box activeBox">
-                      {val?.name}
-                    </div>
-                  </ArcherElement>
-                );
-              }
+          <div className="subFunc">
+            {subFunc?.map((val) => {
               return (
-                <div id={val.id} className="box">
-                  {val?.name}
-                </div>
+                <ArcherElement id={val.id}>
+                  <div id={val.id} className="box activeBox">
+                    {val?.name}
+                  </div>
+                </ArcherElement>
               );
             })}
           </div>
