@@ -97,23 +97,25 @@ const WorkFlow = () => {
                   },
                 })
               );
-              if (activeBox === val) {
-                return (
-                  <ArcherElement id={val.id} relations={relation}>
-                    <div id={val.id} className="activeBox department_card box">
-                      <span className="label">Department</span>
-                    </div>
-                  </ArcherElement>
-                );
-              }
               return (
-                <div
+                <ArcherElement
                   id={val.id}
-                  className="box"
-                  onClick={() => setActiveBox(val)}
+                  relations={activeBox?.id === val?.id ? relation : []}
                 >
-                  {val?.name}
-                </div>
+                  <div
+                    id={val.id}
+                    className={`department_card cardDiv ${
+                      activeBox?.id === val?.id ? "activeBox" : "inactiveBox"
+                    }`}
+                    onClick={() =>
+                      activeBox?.id === val?.id ? null : setActiveBox(val)
+                    }
+                  >
+                    <span className="label">Department</span>
+                    <span className="action_dot">&#8942;</span>
+                    <span className="name">{val?.name}</span>
+                  </div>
+                </ArcherElement>
               );
             })}
           </div>
@@ -136,10 +138,24 @@ const WorkFlow = () => {
                   },
                 })
               );
+              let nowFunc = [];
+              activeBox?.flow?.map((d) => {
+                nowFunc.push(d?.func);
+              });
               return (
-                <ArcherElement id={val.id} relations={relation}>
-                  <div id={val.id} className="box activeBox">
-                    {val?.name}
+                <ArcherElement
+                  id={val.id}
+                  relations={nowFunc?.includes(val?.id) ? relation : []}
+                >
+                  <div
+                    id={val.id}
+                    className={`cardDiv function_card ${
+                      nowFunc?.includes(val?.id) ? "activeBox" : "inactiveBox"
+                    }`}
+                  >
+                    <span className="label">Function</span>
+                    <span className="action_dot">&#8942;</span>
+                    <span className="name">{val?.name}</span>
                   </div>
                 </ArcherElement>
               );
@@ -147,10 +163,18 @@ const WorkFlow = () => {
           </div>
           <div className="subFunc">
             {subFunc?.map((val) => {
+               let nowFunc = [];
+               activeBox?.flow?.map((d) => {
+                 d?.subFunc?.map(i =>{
+                  nowFunc.push(i);
+                 })
+               });
               return (
                 <ArcherElement id={val.id}>
-                  <div id={val.id} className="box activeBox">
-                    {val?.name}
+                  <div id={val.id} className={`cardDiv subFunc_card ${nowFunc?.includes(val?.id) ? 'activeBox' : 'inactiveBox'}`}>
+                    <span className="label">Function</span>
+                    <span className="action_dot">&#8942;</span>
+                    <span className="name">{val?.name}</span>
                   </div>
                 </ArcherElement>
               );

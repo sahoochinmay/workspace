@@ -5,7 +5,7 @@
   justify-content: space-between;
   max-width: 1500px;
 }
-.box {
+.cardDiv {
   margin: 10px;
   width: 277px;
   height: 108px;
@@ -15,17 +15,55 @@
   cursor: pointer;
   box-shadow: 0px 2px 1px -1px rgba(180, 179, 189, 0.35),
     2px 0px 1px rgba(180, 179, 189, 0.24), 0px 2px 8px rgba(180, 179, 189, 0.5);
-  padding: 5px;
+  padding: 10px;
   position: relative;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
 }
-.activeBox.department_card .label {
+.label{
   color: white;
-  background-color: #d89b54;
   font-family: Poppins;
-  font-style: normal;
+  font-style: normal; 
   font-weight: normal;
   font-size: 13px;
-  float: left;
   border-radius: 4px;
   padding: 2px 5px; 
+}
+.name{
+  margin-top: 25px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.action_dot{
+  position: absolute;
+  font-size: 20px;
+  font-weight: bold;
+  color: #969696;
+  right: 5px;
+}
+.inactiveBox .name{
+  color: #AEAEAE;
+}
+/* Department */
+.activeBox.department_card .label {
+  background-color: #d89b54;
+}
+.inactiveBox.department_card .label {
+  background-color: #EFDDC8;
+}
+
+/* Function */
+.activeBox.function_card .label{
+  background-color: #6866BE;
+}
+.inactiveBox.function_card .label{
+  background-color: #CECDE7;
+}
+/* subFunction */
+.activeBox.subFunc_card .label{
+  background-color: #A5BA77;
+}
+.inactiveBox.subFunc_card .label{
+  background-color: #d4e6af;
 }
