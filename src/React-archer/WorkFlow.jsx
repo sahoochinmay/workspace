@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./workflow.css";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { v4 as uuidv4 } from "uuid";
+import NewAddModal from "./NewAddModal";
 
 const WorkFlow = () => {
   const [dept, setDept] = useState([
@@ -79,9 +80,52 @@ const WorkFlow = () => {
     },
   ]);
   const [activeBox, setActiveBox] = useState(dept[0]);
+  const [addNewModa, setAddNewModal] = useState(false);
+  const handleAddCard = (id, data) => {
+    switch (id) {
+      case "department":
+        let tempDep = [
+          ...dept,
+          {
+            id: uuidv4(),
+            name: data,
+          },
+        ];
+        setDept([...tempDep]);
+        break;
+      case "function":
+        let tempFunc = [
+          ...func,
+          {
+            id: uuidv4(),
+            name: data,
+          },
+        ];
+        setFunc([...tempFunc]);
+        break;
+      case "subfunction":
+        let tempSubFunc = [
+          ...subFunc,
+          {
+            id: uuidv4(),
+            name: data,
+          },
+        ];
+        setSubFunc([...tempSubFunc]);
+        break;
+      default:
+        break;
+    }
+  };
   return (
     <div>
+      <NewAddModal
+        isOpen={addNewModa}
+        handleClose={() => setAddNewModal(false)}
+        handleAddCard={(id, data) => handleAddCard(id, data)}
+      />
       <h2>Workflow</h2>
+      <button onClick={() => setAddNewModal(true)}>+ Add New</button>
       <ArcherContainer lineStyle="curve" strokeColor="black">
         <div className="workflow_container">
           <div className="department">
@@ -163,15 +207,20 @@ const WorkFlow = () => {
           </div>
           <div className="subFunc">
             {subFunc?.map((val) => {
-               let nowFunc = [];
-               activeBox?.flow?.map((d) => {
-                 d?.subFunc?.map(i =>{
+              let nowFunc = [];
+              activeBox?.flow?.map((d) => {
+                d?.subFunc?.map((i) => {
                   nowFunc.push(i);
-                 })
-               });
+                });
+              });
               return (
                 <ArcherElement id={val.id}>
-                  <div id={val.id} className={`cardDiv subFunc_card ${nowFunc?.includes(val?.id) ? 'activeBox' : 'inactiveBox'}`}>
+                  <div
+                    id={val.id}
+                    className={`cardDiv subFunc_card ${
+                      nowFunc?.includes(val?.id) ? "activeBox" : "inactiveBox"
+                    }`}
+                  >
                     <span className="label">Function</span>
                     <span className="action_dot">&#8942;</span>
                     <span className="name">{val?.name}</span>
