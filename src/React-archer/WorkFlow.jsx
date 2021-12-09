@@ -3,7 +3,9 @@ import "./workflow.css";
 import { ArcherContainer, ArcherElement } from "react-archer";
 import { v4 as uuidv4 } from "uuid";
 import NewAddModal from "./NewAddModal";
-
+import ConnectFunctionModal from "./ConnectFunctionModal";
+import ConnectSubFunctionModal from "./ConnectSubFunctionModal"
+import DotPopover from "./DotPopover";
 const WorkFlow = () => {
   const [dept, setDept] = useState([
     {
@@ -37,10 +39,12 @@ const WorkFlow = () => {
     {
       id: "dep3",
       name: "dep3",
+      flow: [],
     },
     {
       id: "dep4",
       name: "dep4",
+      flow: [],
     },
   ]);
   const [func, setFunc] = useState([
@@ -81,6 +85,14 @@ const WorkFlow = () => {
   ]);
   const [activeBox, setActiveBox] = useState(dept[0]);
   const [addNewModa, setAddNewModal] = useState(false);
+  const [connectFunctionModal, setConnectFunctionModal] = useState({
+    id: null,
+    state: false,
+  });
+  const [connectSubFunctionModal, setConnectSubFunctionModal] = useState({
+    id: null,
+    state: false,
+  });
   const handleAddCard = (id, data) => {
     switch (id) {
       case "department":
@@ -89,6 +101,7 @@ const WorkFlow = () => {
           {
             id: uuidv4(),
             name: data,
+            flow: [],
           },
         ];
         setDept([...tempDep]);
@@ -98,7 +111,7 @@ const WorkFlow = () => {
           ...func,
           {
             id: uuidv4(),
-            name: data,
+            name: data
           },
         ];
         setFunc([...tempFunc]);
@@ -108,7 +121,7 @@ const WorkFlow = () => {
           ...subFunc,
           {
             id: uuidv4(),
-            name: data,
+            name: data
           },
         ];
         setSubFunc([...tempSubFunc]);
@@ -117,12 +130,67 @@ const WorkFlow = () => {
         break;
     }
   };
+  const handleConnectFunction = (id, data) => {
+    let tempDept = [...dept];
+    let objIndex = tempDept.findIndex((obj) => obj.id === id);
+    tempDept[objIndex]?.flow?.push({
+      func: data,
+      subFunc:[]
+    });
+    setDept([...tempDept]);
+  };
+  const handleDeleteDept = (id) =>{
+    let tempDept = [...dept];
+    let  objIndex = tempDept.findIndex((obj => obj.id === id));
+    tempDept.splice(objIndex, 1);
+    setDept([...tempDept])
+    let tempFunc = [...func]
+    setFunc([...tempFunc])
+  }
+  const handleConnectSubFunction = (id,funId,data) =>{
+    let tempDept = [...dept];
+    let  objIndex = tempDept.findIndex((obj => obj.id === id));
+    tempDept[objIndex]?.flow?.map((i) =>{
+      if(i?.func === funId)
+      {
+        let  funIndx = tempDept[objIndex]?.flow?.findIndex((obj => obj.func === funId));
+        tempDept[objIndex]?.flow[funIndx]?.subFunc?.push(data)
+      }
+    })
+  }
   return (
     <div>
       <NewAddModal
         isOpen={addNewModa}
         handleClose={() => setAddNewModal(false)}
         handleAddCard={(id, data) => handleAddCard(id, data)}
+      />
+      <ConnectFunctionModal
+        isOpen={connectFunctionModal?.state}
+        handleClose={() =>
+          setConnectFunctionModal({
+            id: null,
+            state: false,
+          })
+        }
+        handleConnectFunction={(id, data) => handleConnectFunction(id, data)}
+        func={func}
+        dept={dept}
+        depId={connectFunctionModal?.id}
+      />
+      <ConnectSubFunctionModal 
+       isOpen={connectSubFunctionModal?.state}
+       handleClose={() =>
+         setConnectSubFunctionModal({
+           id: null,
+           state: false,
+         })
+       }
+       handleConnectFunction={(id,funId, data) => handleConnectSubFunction(id,funId, data)}
+       subFunc={subFunc}
+       dept={dept}
+       funId={connectSubFunctionModal?.id}
+       depId={activeBox?.id}
       />
       <h2>Workflow</h2>
       <button onClick={() => setAddNewModal(true)}>+ Add New</button>
@@ -141,23 +209,32 @@ const WorkFlow = () => {
                   },
                 })
               );
+              let state = activeBox?.id === val?.id;
               return (
-                <ArcherElement
-                  id={val.id}
-                  relations={activeBox?.id === val?.id ? relation : []}
-                >
+                <ArcherElement id={val.id} relations={state ? relation : []}>
                   <div
                     id={val.id}
                     className={`department_card cardDiv ${
-                      activeBox?.id === val?.id ? "activeBox" : "inactiveBox"
+                      state ? "activeBox" : "inactiveBox"
                     }`}
-                    onClick={() =>
-                      activeBox?.id === val?.id ? null : setActiveBox(val)
-                    }
+                    onClick={() => (state ? null : setActiveBox(val))}
                   >
                     <span className="label">Department</span>
-                    <span className="action_dot">&#8942;</span>
+                    <DotPopover state={state} handleDeleteDept={() =>handleDeleteDept(val?.id)} />
                     <span className="name">{val?.name}</span>
+                    <span
+                      className="addIcon"
+                      onClick={() =>
+                        state
+                          ? setConnectFunctionModal({
+                              id: val?.id,
+                              state: true,
+                            })
+                          : null
+                      }
+                    >
+                      +
+                    </span>
                   </div>
                 </ArcherElement>
               );
@@ -186,20 +263,34 @@ const WorkFlow = () => {
               activeBox?.flow?.map((d) => {
                 nowFunc.push(d?.func);
               });
+              let state = nowFunc?.includes(val?.id)
               return (
                 <ArcherElement
                   id={val.id}
-                  relations={nowFunc?.includes(val?.id) ? relation : []}
+                  relations={state ? relation : []}
                 >
                   <div
                     id={val.id}
                     className={`cardDiv function_card ${
-                      nowFunc?.includes(val?.id) ? "activeBox" : "inactiveBox"
+                      state ? "activeBox" : "inactiveBox"
                     }`}
                   >
                     <span className="label">Function</span>
-                    <span className="action_dot">&#8942;</span>
+                    <DotPopover state={state} handleDeleteDept={() =>null} />
                     <span className="name">{val?.name}</span>
+                    <span
+                      className="addIcon"
+                      onClick={() =>
+                        state
+                          ? setConnectSubFunctionModal({
+                              id: val?.id,
+                              state: true,
+                            })
+                          : null
+                      }
+                    >
+                      +
+                    </span>
                   </div>
                 </ArcherElement>
               );

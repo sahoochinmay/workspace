@@ -44,11 +44,31 @@ button{
   position: absolute;
   font-size: 20px;
   font-weight: bold;
+  right: 15px;
+}
+.activeBox > .action_dot{
+  color: black;
+}
+.inactiveBox > .action_dot{
   color: #969696;
-  right: 5px;
 }
 .inactiveBox .name{
   color: #AEAEAE;
+}
+.addIcon{
+  height: 24px;
+  width: 24px;
+  color: white;
+  border-radius: 50%;
+  position: absolute;
+  right: -10px;
+  top: 39%;
+}
+.activeBox > .addIcon{
+  background-color: black;
+}
+.inactiveBox > .addIcon{
+  background-color: #AEAEAE;
 }
 /* Department */
 .activeBox.department_card .label {
